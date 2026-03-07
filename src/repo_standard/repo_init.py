@@ -33,7 +33,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--python-version", default="3.12")
     parser.add_argument("--author", default="")
-    parser.add_argument("--output-dir", required=True)
+    parser.add_argument(
+        "--output-dir",
+        default=".",
+        help="Target directory. Defaults to the current working directory.",
+    )
     parser.add_argument("--no-install", action="store_true")
     return parser
 
@@ -55,6 +59,14 @@ def ensure_output_dir(output_dir: Path) -> None:
             f"Output directory {output_dir} already exists and is not empty."
         )
     output_dir.mkdir(parents=True, exist_ok=True)
+
+
+def resolve_starter_dir(profile: str, repo_root: Path | None = None) -> Path:
+    if repo_root is not None:
+        candidate = repo_root / "starter-kits" / profile
+        if candidate.exists():
+            return candidate
+    return Path(__file__).resolve().parent / "starter_kits" / profile
 
 
 def copy_starter(starter_dir: Path, output_dir: Path) -> None:
@@ -79,6 +91,26 @@ def render_text_files(output_dir: Path, values: dict[str, str]) -> None:
         for placeholder, key in PLACEHOLDERS.items():
             text = text.replace(placeholder, values[key])
         path.write_text(text, encoding="utf-8")
+
+
+def ensure_no_unresolved_placeholders(output_dir: Path) -> None:
+    unresolved: list[str] = []
+    placeholder_tokens = tuple(PLACEHOLDERS)
+    for path in output_dir.rglob("*"):
+        if "__pycache__" in path.parts or path.suffix == ".pyc":
+            continue
+        if not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        matches = [token for token in placeholder_tokens if token in text]
+        if matches:
+            unresolved.append(f"{path.relative_to(output_dir)}: {', '.join(matches)}")
+    if unresolved:
+        details = "; ".join(unresolved)
+        raise ValueError(f"Unresolved placeholders remain after bootstrap: {details}")
 
 
 def rename_package_dir(output_dir: Path, package_name: str) -> None:
@@ -130,7 +162,7 @@ def bootstrap_repo(
 ) -> Path:
     validate_package_name(package_name)
 
-    starter_dir = repo_root / "starter-kits" / profile
+    starter_dir = resolve_starter_dir(profile, repo_root)
     ensure_output_dir(output_dir)
     copy_starter(starter_dir, output_dir)
 
@@ -145,6 +177,7 @@ def bootstrap_repo(
     render_text_files(output_dir, values)
     rename_package_dir(output_dir, package_name)
     update_python_version(output_dir, python_version)
+    ensure_no_unresolved_placeholders(output_dir)
 
     if not no_install:
         run_optional_installs(output_dir)
