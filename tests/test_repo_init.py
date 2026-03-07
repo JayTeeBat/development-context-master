@@ -6,7 +6,9 @@ import pytest
 
 from repo_standard.repo_init import (
     bootstrap_repo,
+    ensure_no_unresolved_placeholders,
     ensure_output_dir,
+    main,
     validate_package_name,
 )
 
@@ -33,10 +35,12 @@ def test_bootstrap_repo_renders_python_starter(tmp_path: Path) -> None:
     smoke_test_text = (output_dir / "tests" / "test_smoke.py").read_text(
         encoding="utf-8"
     )
+    readme_text = (output_dir / "README.md").read_text(encoding="utf-8")
 
     assert "__REPO_NAME__" not in agents_text
     assert "demo-service" in pyproject_text
-    assert "from demo_service import __doc__" in smoke_test_text
+    assert 'importlib.import_module("demo_service")' in smoke_test_text
+    assert "## First 10 Minutes" in readme_text
     assert (output_dir / "src" / "demo_service" / "__init__.py").exists()
     assert not (output_dir / "src" / "package_name").exists()
 
@@ -53,3 +57,35 @@ def test_ensure_output_dir_rejects_non_empty_directory(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="not empty"):
         ensure_output_dir(output_dir)
+
+
+def test_ensure_no_unresolved_placeholders_rejects_leftovers(tmp_path: Path) -> None:
+    file_path = tmp_path / "README.md"
+    file_path.write_text("leftover __REPO_NAME__", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Unresolved placeholders remain"):
+        ensure_no_unresolved_placeholders(tmp_path)
+
+
+def test_main_bootstraps_into_current_working_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+
+    exit_code = main(
+        [
+            "--profile",
+            "python",
+            "--repo-name",
+            "empty-dir-app",
+            "--package-name",
+            "empty_dir_app",
+            "--description",
+            "Empty directory bootstrap",
+            "--no-install",
+        ]
+    )
+
+    assert exit_code == 0
+    assert (tmp_path / "AGENTS.md").exists()
+    assert (tmp_path / "src" / "empty_dir_app" / "__init__.py").exists()

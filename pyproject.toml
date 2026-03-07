@@ -23,6 +23,17 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/repo_standard"]
+include = ["src/repo_standard/starter_kits/**"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src/repo_standard/starter_kits/**",
+  "/starter-kits/**",
+  "/docs/**",
+  "/examples/**",
+  "/profiles/**",
+  "/templates/**",
+]
 
 [tool.ruff]
 line-length = 88

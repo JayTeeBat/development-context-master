@@ -49,7 +49,7 @@ define the intent and rules.
 The recommended workflow is:
 
 1. Create an empty target repository or working directory.
-2. Run the bootstrap tool:
+2. Run the bootstrap tool from this repository:
 
 ```bash
 uv run repo-init \
@@ -60,12 +60,29 @@ uv run repo-init \
   --output-dir ../my-service
 ```
 
-3. Review the generated `AGENTS.md` and `README.md`.
+3. Review the generated `AGENTS.md` and `README.md` in the target directory.
 4. Run the quality gates in the generated repository.
 5. Make the initial commit on `main`.
 
 Do not clone this standards repository as the starting point for a product
 repository. Generate or template the target repository separately.
+
+If you want to bootstrap directly from an empty target directory without passing
+`--output-dir`, install the command once:
+
+```bash
+uv tool install --from /path/to/repo-standard-kit repo-init
+```
+
+Then run inside the empty target directory:
+
+```bash
+repo-init \
+  --profile python \
+  --repo-name my-service \
+  --package-name my_service \
+  --description "Short repo purpose"
+```
 
 ## Current Profiles
 
@@ -79,6 +96,11 @@ Use this repository in one of two ways:
 - New repository: bootstrap from `starter-kits/python/` via `repo-init`
 - Existing repository: adapt the repo to match the standard and populate
   `AGENTS.md` using `templates/AGENTS.md`
+
+## Golden Path Example
+
+See [examples/python-service/walkthrough.md](/home/thomazo/dev/repo-standard-kit/examples/python-service/walkthrough.md)
+for a concrete service-oriented bootstrap flow and the expected generated shape.
 
 ## Design Principles
 
