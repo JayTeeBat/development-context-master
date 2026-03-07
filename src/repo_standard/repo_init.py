@@ -45,8 +45,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def validate_package_name(package_name: str) -> None:
     if not package_name.isidentifier():
         raise ValueError(
-            "--package-name must be a valid Python identifier "
-            f"(got {package_name!r})"
+            f"--package-name must be a valid Python identifier (got {package_name!r})"
         )
 
 

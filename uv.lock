@@ -193,7 +193,7 @@ wheels = [
 ]
 
 [[package]]
-name = "repo-development-standard"
+name = "repo-standard-kit"
 version = "0.1.0"
 source = { editable = "." }
 
