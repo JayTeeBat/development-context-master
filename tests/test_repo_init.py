@@ -1,0 +1,55 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from repo_standard.repo_init import (
+    bootstrap_repo,
+    ensure_output_dir,
+    validate_package_name,
+)
+
+
+def test_bootstrap_repo_renders_python_starter(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    output_dir = tmp_path / "demo-service"
+
+    bootstrap_repo(
+        repo_root=repo_root,
+        profile="python",
+        repo_name="demo-service",
+        package_name="demo_service",
+        description="Demo service",
+        repo_type="service",
+        python_version="3.12",
+        author="",
+        output_dir=output_dir,
+        no_install=True,
+    )
+
+    agents_text = (output_dir / "AGENTS.md").read_text(encoding="utf-8")
+    pyproject_text = (output_dir / "pyproject.toml").read_text(encoding="utf-8")
+    smoke_test_text = (output_dir / "tests" / "test_smoke.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "__REPO_NAME__" not in agents_text
+    assert "demo-service" in pyproject_text
+    assert "from demo_service import __doc__" in smoke_test_text
+    assert (output_dir / "src" / "demo_service" / "__init__.py").exists()
+    assert not (output_dir / "src" / "package_name").exists()
+
+
+def test_validate_package_name_rejects_invalid_identifier() -> None:
+    with pytest.raises(ValueError, match="valid Python identifier"):
+        validate_package_name("not-valid")
+
+
+def test_ensure_output_dir_rejects_non_empty_directory(tmp_path: Path) -> None:
+    output_dir = tmp_path / "existing"
+    output_dir.mkdir()
+    (output_dir / "marker.txt").write_text("x", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="not empty"):
+        ensure_output_dir(output_dir)

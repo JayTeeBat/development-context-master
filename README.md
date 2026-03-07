@@ -1,59 +1,89 @@
-# development-context-master
+# repo-development-standard
 
-Baseline workspace development standards and operating policy.
+Portable development standards, starter kits, and bootstrap tooling for modern
+software repositories.
 
-## What This Repository Provides
+## Purpose
 
-This repository maintains a canonical development context document that can be used as the root policy for a multi-repo workspace.
+This repository defines a practical operating model for building repositories
+with humans and agents working together. It is designed to make good defaults
+easy to adopt when creating a new repository and easy to reference when
+maintaining an existing one.
 
-Primary artifact:
-- `DEVELOPMENT-CONTEXT.md`: workspace-wide workflow, engineering guidelines, tooling defaults, quality gates, documentation policy, and definition of done.
+This repository provides:
 
-## Intended Usage
+- normative documentation for repository development standards
+- a required `AGENTS.md` contract for repository-level guidance
+- a complete Python profile with quality gates and coding standards
+- a trunk-based collaboration workflow for parallel development
+- a standard Python repository layout
+- starter-kit assets for new repositories
+- a thin bootstrap tool for generating a new repository from the starter kit
+- a JavaScript/TypeScript profile scaffold for later expansion
 
-Use this repository when you want a single source of truth for how development should be performed across multiple repositories.
+## What Is Normative
 
-Typical use cases:
-- Bootstrapping a new workspace with consistent engineering standards.
-- Aligning agent and human contributors on shared workflow and quality expectations.
-- Standardizing Python-heavy development with Astral tooling (`uv`, `ruff`, `ty`).
+The normative source documents are:
 
-## Policy Model (Precedence)
+- `docs/repo-standard.md`
+- `docs/agent-operating-model.md`
+- `docs/git-workflow.md`
+- `docs/repo-layout.md`
+- `docs/bootstrap-workflow.md`
+- `profiles/python.md`
 
-The model is intentionally two-level:
-1. Workspace baseline in `DEVELOPMENT-CONTEXT.md`.
-2. Repository-specific overrides in each repo `AGENTS.md`.
+Templates and starter kits implement those standards, but the documents above
+define the intent and rules.
 
-Repository `AGENTS.md` can refine implementation details, but should not weaken workspace-level safety and security expectations.
+## Repository Layout
 
-## Quick Start
+- `docs/`: standards and operating guidance
+- `profiles/`: language or repo-type specific standards
+- `templates/`: reusable templates for repo-level files
+- `starter-kits/`: copyable repository skeletons
+- `src/repo_standard/`: packaged bootstrap implementation
+- `examples/`: filled examples showing the standard in practice
 
-1. Keep `DEVELOPMENT-CONTEXT.md` at the workspace root.
-2. Update the `Scope` section path to match your local workspace.
-3. In each repository, add or update `AGENTS.md` with project-specific rules.
-4. Ensure user-facing guidance lives in each repo `README.md`.
-5. Add workflow diagrams as `.puml` files where process clarity is needed.
+## Bootstrap A New Python Repository
 
-## Default Quality Gates
+The recommended workflow is:
 
-Unless a repository defines replacements in its `AGENTS.md`, run:
+1. Create an empty target repository or working directory.
+2. Run the bootstrap tool:
 
 ```bash
-uv sync
-ruff format --check .
-ruff check .
-ty check
-pytest
+uv run repo-init \
+  --profile python \
+  --repo-name my-service \
+  --package-name my_service \
+  --description "Short repo purpose" \
+  --output-dir ../my-service
 ```
 
-## Maintenance Guidelines
+3. Review the generated `AGENTS.md` and `README.md`.
+4. Run the quality gates in the generated repository.
+5. Make the initial commit on `main`.
 
-- Keep `DEVELOPMENT-CONTEXT.md` concise, enforceable, and tool-accurate.
-- Update this repository when workflow, tooling, or policy standards change.
-- Treat changes as governance changes: document rationale clearly in commit/PR descriptions.
+Do not clone this standards repository as the starting point for a product
+repository. Generate or template the target repository separately.
 
-## Related Documentation Roles
+## Current Profiles
 
-- `AGENTS.md`: agent-facing operational instructions.
-- `README.md`: user-facing usage and onboarding documentation.
-- `.puml`: workflow/process diagrams.
+- `python`: first-class, complete, and opinionated
+- `javascript-typescript`: scaffold only for future expansion
+
+## Adoption Paths
+
+Use this repository in one of two ways:
+
+- New repository: bootstrap from `starter-kits/python/` via `repo-init`
+- Existing repository: adapt the repo to match the standard and populate
+  `AGENTS.md` using `templates/AGENTS.md`
+
+## Design Principles
+
+- Portable: no workspace-specific filesystem assumptions
+- Practical: exact commands and concrete file layouts, not abstract policy only
+- Collaborative: explicit human and agent responsibility boundaries
+- Typed: strong typing expectations for Python code
+- Small-batch: trunk-based PR workflow for parallel work

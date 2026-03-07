@@ -1,103 +1,91 @@
-# AGENTS.md Template
+# AGENTS.md
 
-Use this file as a starting point for repository-level agent instructions.
-Copy into a target repository as `AGENTS.md`, then replace placeholders.
+## Repository Purpose
 
-## Purpose
-This file defines agent-facing operating rules for this repository.
-It refines workspace defaults from `DEVELOPMENT-CONTEXT.md` with repo-specific instructions.
-
-## Scope
-Applies to all agent work in this repository.
-
-## Precedence
-1. Safety/security constraints from workspace context are minimum requirements.
-2. This repository `AGENTS.md` defines local implementation rules.
-3. If a conflict exists, follow this file for repo behavior unless it weakens workspace safety/security standards.
+This repository defines portable standards, starter kits, and bootstrap tooling
+for creating and maintaining software repositories with clear human and agent
+operating boundaries.
 
 ## Repository Context
-- Repository name: `<REPO_NAME>`
-- Primary language(s): `<LANGUAGES>`
-- Runtime/build system: `<RUNTIME_OR_BUILD_SYSTEM>`
+
+- Primary focus: repository standards and Python-first starter assets
+- Secondary focus: future JavaScript/TypeScript profile scaffolding
 - Key directories:
-- Source: `<SRC_PATH>`
-- Tests: `<TEST_PATH>`
-- Docs: `<DOCS_PATH>`
-- Entry points/services: `<ENTRYPOINTS>`
+  - `src/`: implementation code for bootstrap tooling
+  - `tests/`: automated verification for the tooling
+  - `docs/`: normative standards
+  - `profiles/`: language-specific standards
+  - `templates/`: reusable file templates
+  - `starter-kits/`: starter repository skeletons
+  - `examples/`: concrete filled examples
 
-## Standard Workflow
-1. Read this `AGENTS.md` first.
-2. Implement the requested feature or change.
-3. Run all repository quality gates.
-4. Update documentation cleanly.
-5. Commit only if all quality gates pass.
+## Human And Agent Responsibilities
 
-## Engineering Guidelines
-- Design clean APIs with explicit boundaries.
-- Prefer maintainable and extendable code.
-- Minimize coupling and isolate responsibilities.
-- Keep public interfaces stable unless a breaking change is approved.
+Humans own:
 
-## Toolchain Standards
-- Python-heavy repositories should default to Astral tooling.
-- Strong typing is expected across production code.
-- Preferred tools: `uv`, `ruff`, `ty`.
-- Repo-specific additions: `<ADDITIONAL_TOOLS>`
+- product direction for the standard
+- approval of breaking changes to the standard contract
+- release and publication decisions
+- language-profile expansion decisions
+
+Agents own:
+
+- writing and updating the standards docs
+- maintaining templates and starter assets
+- implementing bootstrap tooling
+- keeping examples aligned with the standard
+
+Agents must not:
+
+- invent profile rules that are not documented in the standard
+- weaken the documented quality baseline without explicit instruction
+- add a first-class language profile without complete documentation and starter
+  assets
+
+## Workflow
+
+1. Update the normative docs first when changing the standard.
+2. Update templates, starter kits, and examples in the same change.
+3. Validate the bootstrap tool against a temporary output directory.
+4. Keep changes small and focused by concern.
 
 ## Quality Gates
-Run from repository root unless explicitly documented otherwise.
 
-Default baseline:
+Run from repository root:
+
 1. `uv sync`
-2. `ruff format --check .`
-3. `ruff check .`
-4. `ty check`
-5. `pytest`
+2. `uv run pre-commit run --all-files`
+3. `uv run ruff format --check .`
+4. `uv run ruff check .`
+5. `uv run ty check`
+6. `uv run pytest`
+7. `uv run repo-init --profile python --repo-name demo-repo --package-name demo_repo --description "Bootstrap validation" --output-dir /tmp/demo-repo --no-install`
 
-Repository overrides/additions:
-1. `<CUSTOM_GATE_1>`
-2. `<CUSTOM_GATE_2>`
+## Coding Standards
+
+- Keep reusable Python logic under `src/`
+- Keep `tools/` wrappers thin and orchestration-focused
+- Type production function signatures
+- Keep starter assets and tests aligned with the documented standard
 
 ## Testing Policy
-- Logic changes require unit tests.
-- API/integration/data-flow changes require integration tests where boundaries are crossed.
-- Bug fixes require regression coverage.
-- If a required test type is impractical, explain the rationale in PR notes.
 
-## API Compatibility Rules
-- Prefer backward-compatible changes by default.
-- Breaking changes require migration notes and explicit version impact.
-- Deprecations require documentation of replacement path before removal.
+- Changes to bootstrap behavior require automated tests in `tests/`
+- Bug fixes require regression coverage
+- Generated starter output must be validated when the starter changes
 
-## Dependency And Versioning Policy
-- Use pinned or constrained dependency versions as appropriate.
-- Keep dependencies updated on a regular cadence.
-- Validate major upgrades with compatibility review and tests.
+## Repository Layout
 
-## Security Baseline
-- Never commit secrets, tokens, or credentials.
-- Use approved secret management and environment configuration.
-- Do not log sensitive data.
-- Run security/static checks included in quality gates.
+- `src/`: bootstrap implementation
+- `tests/`: automated tests
+- `docs/`: normative standards
+- `profiles/`: language-specific profiles
+- `templates/`: reusable templates
+- `starter-kits/`: starter repo skeletons
+- `examples/`: filled examples
 
-## Documentation Standards
-- `README.md` is user-facing documentation.
-- `AGENTS.md` is agent-facing operational guidance.
-- Use `.puml` for workflow diagrams when process changes or complexity warrants it.
+## Documentation Rules
 
-## Commit And PR Conventions
-- Keep commits focused and scoped.
-- Use clear commit messages that explain intent and impact.
-- PR descriptions should include summary, testing evidence, and documentation impact.
-- Do not merge with failing quality gates.
-
-## Architecture Decision Records
-- Create ADRs for major design decisions and tradeoffs.
-- ADR content should include context, options, decision, and consequences.
-- ADR location: `<ADR_PATH>`
-
-## Definition Of Done
-- Requested change is implemented.
-- Quality gates pass.
-- Relevant docs are updated (`README.md`, `AGENTS.md`, `.puml`, ADRs when needed).
-- Change is ready to merge or committed per repository process.
+- Changes to standards must update the corresponding document in `docs/`
+- Changes to templates or starter kits must keep examples consistent
+- New operating rules belong in docs before they appear in starter assets

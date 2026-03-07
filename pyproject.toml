@@ -1,0 +1,37 @@
+[project]
+name = "repo-development-standard"
+version = "0.1.0"
+description = "Portable development standards, starter kits, and bootstrap tooling for software repositories."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+repo-init = "repo_standard.repo_init:main"
+
+[dependency-groups]
+dev = [
+  "pre-commit>=4.0.0",
+  "pytest>=8.0.0",
+  "ruff>=0.6.0",
+  "ty>=0.0.1a16",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/repo_standard"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "PT"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ty.src]
+include = ["src", "tests"]
